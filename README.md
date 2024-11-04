@@ -1,3 +1,3 @@
 # LexiClick
-## LexiClick is a chrome extension 
-Instantly discover word meanings, examples, synonyms, and antonyms with a simple double-LexiClick. For deeper, AI-driven insights, search any word directly within the extension for enhanced results!
+## Double Click any word and make reading more intuitive.
+LexiClick is an advanced Chrome extension crafted to enrich your vocabulary journey by instantly providing definitions, examples, synonyms, and antonyms for any word you encounter. With built-in AI-driven search, LexiClick offers deeper insights directly within the extension, making word exploration smarter and more intuitive.
