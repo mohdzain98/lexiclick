@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const Popup = (props) => {
-    const {wordapi, wordhost} = props.prop
+    const {wordapi, wordhost,host} = props.prop
     const [word, setWord] = useState("");
     const [phrase, setPhrase] = useState("")
     const [result, setResults] = useState([])
@@ -14,7 +14,7 @@ const Popup = (props) => {
     const [airesult, setAiresult] = useState(true)
     const [btn, setBtn] = useState(true)
     const [btns, setBtns] = useState(true)
-  
+
     const options = {
         method: 'GET',
         headers: {
@@ -95,7 +95,7 @@ const Popup = (props) => {
       e.preventDefault()
       setAiloader("spinner-border spinner-border-sm")
       setBtn(false)
-      const aires = await fetch(`http://127.0.0.1:5000/search`,{
+      const aires = await fetch(`${host}/search`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

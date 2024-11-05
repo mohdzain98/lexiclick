@@ -4,10 +4,10 @@ import Popup from './Components/Popup';
 function App() {
   const wordapi=process.env.REACT_APP_WORDAPI
   const wordhost=process.env.REACT_APP_WHOST
-  const tkey=process.env.REACT_APP_TKEY
-  console.log(wordapi,wordhost)
+  const host=process.env.REACT_APP_HOST
+  
   return (
-    <Popup prop={{wordapi,wordhost,tkey}}/>
+    <Popup prop={{wordapi,wordhost,host}}/>
   );
 }
 

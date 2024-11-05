@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LexiClick",
   "version": "1.0",
-  "description": "Instantly discover word meanings, examples, synonyms, and antonyms with a simple double-LexiClick. For deeper, AI-driven insights, search any word directly within the extension for enhanced results!",
+  "description": "LexiClick: Instantly access definitions, examples, synonyms, and antonyms on double-click, plus AI-driven search for deeper insights",
   "permissions": ["activeTab", "scripting"],
   "background": {
     "service_worker": "background.js"
