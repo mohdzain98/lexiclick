@@ -1,5 +1,4 @@
 (function() {
-  // Store reference to the floating div
   let popupDiv = null;
 
   // Create and append styles to document
@@ -64,21 +63,16 @@
 
   // Function to create popup
   function createPopup(x, y) {
-    // Remove existing popup if any
     removePopup();
 
-    // Create new popup
     popupDiv = document.createElement('div');
     popupDiv.className = 'dict-popup';
-    
-    // Position popup
+
+    let left = x;
+    let top = y + 20;
+
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    
-    let left = x;
-    let top = y + 20; // Add some offset from cursor
-
-    // Adjust position to keep within viewport
     if (left + 300 > viewportWidth) {
       left = viewportWidth - 320;
     }
@@ -89,28 +83,22 @@
     popupDiv.style.left = `${left}px`;
     popupDiv.style.top = `${top}px`;
 
-    // Add close button
     const closeButton = document.createElement('button');
     closeButton.className = 'dict-popup__close';
     closeButton.textContent = '×';
     closeButton.addEventListener('click', removePopup);
     popupDiv.appendChild(closeButton);
 
-    // Add content container
     const content = document.createElement('div');
     content.className = 'dict-popup__content';
     popupDiv.appendChild(content);
 
-    // Add loading state
     content.textContent = 'Loading...';
 
-    // Append to document
     document.body.appendChild(popupDiv);
-
     return content;
   }
 
-  // Function to show word definition
   async function showDefinition(word, x, y) {
     const content = createPopup(x, y);
 
@@ -118,11 +106,8 @@
       const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Word not found');
-      }
-
-      if (!popupDiv) return; // Check if popup was closed
+      if (!response.ok) throw new Error(data.message || 'Word not found');
+      if (!popupDiv) return;
 
       const wordData = data[0];
       const meaning = wordData.meanings[0];
@@ -130,8 +115,7 @@
       content.innerHTML = `
         <div class="dict-popup__section">
           <div class="dict-popup__title">
-            ${word}
-            ${wordData.phonetic ? `<span style="color: #666; font-weight: normal">${wordData.phonetic}</span>` : ''}
+            ${word} ${wordData.phonetic ? `<span style="color: #666; font-weight: normal">${wordData.phonetic}</span>` : ''}
           </div>
           <div>${meaning.definitions[0].definition}</div>
         </div>
@@ -139,20 +123,17 @@
           <div class="dict-popup__section">
             <div class="dict-popup__title">Example:</div>
             <div style="font-style: italic; color: #666">"${meaning.definitions[0].example}"</div>
-          </div>
-        ` : ''}
+          </div>` : ''}
         ${meaning.synonyms.length ? `
           <div class="dict-popup__section">
             <div class="dict-popup__title">Synonyms:</div>
             <div>${meaning.synonyms.slice(0, 5).join(', ')}</div>
-          </div>
-        ` : ''}
+          </div>` : ''}
         ${meaning.antonyms.length ? `
           <div class="dict-popup__section">
             <div class="dict-popup__title">Antonyms:</div>
             <div>${meaning.antonyms.slice(0, 5).join(', ')}</div>
-          </div>
-        ` : ''}
+          </div>` : ''}
         <div class="dict-popup__suggestion">
           For better results, find words using the extension popup ↗
         </div>
@@ -171,7 +152,6 @@
     }
   }
 
-  // Handle double click
   function handleDoubleClick(event) {
     const selection = window.getSelection();
     const word = selection.toString().trim();
@@ -188,25 +168,31 @@
     }
   }
 
-  // Handle click outside
   function handleClickOutside(event) {
     if (popupDiv && !popupDiv.contains(event.target)) {
       removePopup();
     }
   }
 
-  // Handle cleanup on visibility change
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'hidden') {
-      removePopup();
-    }
-  });
+  function observeScrollAndDOMChanges() {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(() => {
+        document.removeEventListener('dblclick', handleDoubleClick);
+        document.addEventListener('dblclick', handleDoubleClick);
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 
-  // Add event listeners
+    // Listen for scroll events to re-attach event listener for dynamically loaded content
+    window.addEventListener('scroll', () => {
+      document.removeEventListener('dblclick', handleDoubleClick);
+      document.addEventListener('dblclick', handleDoubleClick);
+    });
+  }
+
   document.addEventListener('dblclick', handleDoubleClick);
   document.addEventListener('click', handleClickOutside);
 
-  // Listen for navigation events
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'CLEANUP') {
       removePopup();
@@ -215,4 +201,6 @@
       }
     }
   });
+
+  observeScrollAndDOMChanges();
 })();
